@@ -1,19 +1,23 @@
 package net.engineeringdigest.journalApp.Entity;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import lombok.*;
+import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+import java.time.LocalDateTime;
+
+@Getter
+@Setter
+@Document
 public class JournalEntity {
     private String title;
-
-    @NotNull
-    private Integer id;
-
+    @Id
+    @JsonSerialize(using = ToStringSerializer.class)
+    private String id;
     private String content;
+    private LocalDateTime Date;
 
 }
