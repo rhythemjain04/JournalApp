@@ -4,6 +4,8 @@ import net.engineeringdigest.journalApp.Entity.JournalEntity;
 import net.engineeringdigest.journalApp.Repository.JournalEntryRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -28,16 +30,21 @@ public class JournalService {
         return journalEntryRepository.findAll();
     }
 
-    public void deleteById(String id){
+    public ResponseEntity<?> deleteById(String id){
+        if (journalEntryRepository.findById(id).isPresent()){
         journalEntryRepository.deleteById(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     public void deleteAll(){
         journalEntryRepository.deleteAll();
     }
 
-    public JournalEntity updateEntry(JournalEntity journalEntity, String id) throws NullPointerException{
+    public ResponseEntity<JournalEntity> updateEntry(JournalEntity journalEntity, String id) throws NullPointerException{
         JournalEntity oldJournalEntity = journalEntryRepository.findById(id).orElse(null);
+
         if(oldJournalEntity!=null){
             if(!oldJournalEntity.getContent().equalsIgnoreCase(journalEntity.getContent())){
                 oldJournalEntity.setContent(journalEntity.getContent());
@@ -48,7 +55,8 @@ public class JournalService {
         }
         if (oldJournalEntity!=null) {
             journalEntryRepository.save(oldJournalEntity);
+            return ResponseEntity.ok(oldJournalEntity);
         }
-        return oldJournalEntity;
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }

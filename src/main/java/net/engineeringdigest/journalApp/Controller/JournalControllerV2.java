@@ -23,39 +23,44 @@ public class JournalControllerV2 {
     }
     
     @PostMapping("/Entry")
-    public JournalEntity JournalEntry(@RequestBody JournalEntity abc){
+    public ResponseEntity<JournalEntity> JournalEntry(@RequestBody JournalEntity abc){
         journalService.saveJournalEntry(abc);
-        return abc;
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping
-    public List<JournalEntity> entries(){
-        return journalService.getAll();
+    public ResponseEntity<?> entries(){
+        List<JournalEntity> entries =  journalService.getAll();
+        if(entries.isEmpty()){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(entries,HttpStatus.OK);
     }
 
     @GetMapping("id/{id}")
     public ResponseEntity<JournalEntity> entry(@PathVariable String id){
         Optional<JournalEntity> journalEntry = journalService.getJournalEntry(id);
         if(journalEntry.isPresent()){
-            return ResponseEntity.ok(journalEntry.get());
+            return new ResponseEntity<>(journalEntry.orElse(null),HttpStatus.OK);
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
     }
 
     @PutMapping("id/{id}")
-    public JournalEntity update(@RequestBody JournalEntity abc,@PathVariable String id){
+    public ResponseEntity<JournalEntity> update(@RequestBody JournalEntity abc,@PathVariable String id){
         return journalService.updateEntry(abc, id);
     }
 
     @DeleteMapping("id/{id}")
-    public void deleteEntryFromMap(@PathVariable String id){
-        journalService.deleteById(id);
+    public ResponseEntity<?> deleteEntryFromMap(@PathVariable String id){
+         return journalService.deleteById(id);
     }
 
     @DeleteMapping("/Entries")
-    public void deleteAllEntries(){
+    public ResponseEntity<?> deleteAllEntries(){
         journalService.deleteAll();
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }
